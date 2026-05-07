@@ -85,4 +85,14 @@ Ran **`git push origin poc-challenge`** in **calendar-jigsaw** and **raas-jigsaw
 
 ---
 
+**2026-05-07**
+
+User:
+Created new Java Spring Boot project **Jigsaw-api** — commit, ignore `.idea`, `.mvn`.
+
+Assistant:
+Added **`jigsaw-api/`** (Spring Boot skeleton under `com.example.jigsawapi`). Updated **`jigsaw-api/.gitignore`**: **`.idea/`**, **`.mvn/`** (and dropped only ignoring `maven-wrapper.jar`). Staged project files; **`.idea`** / **`.mvn`** not tracked.
+
+---
+
 [End of record]
