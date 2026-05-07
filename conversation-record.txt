@@ -151,4 +151,12 @@ Rewrote **`README.md`** 「交付物说明」：删掉压缩包/Git 小节；用
 
 ---
 
+User:
+commit, push.
+
+Assistant:
+Committed **`jigsaw-web`** submodule (**Dockerfile**, **nginx/default.conf**, **`.dockerignore`**); restored **`pnpm-lock.yaml`** (had been deleted in working tree). Parent **`poc-challenge.github.io`**: compose, **`jigsaw-api`** Docker files, **`README`**, logs, **`chat/conversation.txt`**. Submodule push failed **GH007** (private email); amended author to **`xuqplus@users.noreply.github.com`**, pushed **`poc-challenge`** → **`raas-jigsaw-web.github.io`**, parent **`master`** → **`xuqplus/poc-challenge`**. Follow-up commit for transcript detail.
+
+---
+
 [End of record]
