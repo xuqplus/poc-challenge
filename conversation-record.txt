@@ -127,4 +127,28 @@ Assistant:
 
 ---
 
+User:
+Delivery for interview: Dockerfiles for web and api, validate images locally, push to Docker Hub (qunqunxu398), docker-compose for reviewers, README technical memo sections.
+
+Assistant:
+Added **`jigsaw-api/Dockerfile`** (Maven build stage → **`eclipse-temurin:17-jre-jammy`**), **`jigsaw-api/.dockerignore`**, **`jigsaw-web/Dockerfile`** (**pnpm** build → **nginx:alpine** + **`nginx/default.conf`** SPA fallback), **`jigsaw-web/.dockerignore`**, repo-root **`docker-compose.yml`** (**api** host **8080**, **web** host **8081**→80). Extended **`README.md`** with deliverables zip + `.git`, compose usage, architecture/trade-offs table, AI collaboration placeholder, verification, Hub **`docker login`** / tag / push. **`chat/conversation.txt`** transcript per workspace rule. Local **`docker compose build`** not completed here: Docker daemon unavailable and Compose V2 plugin missing on the PATH used; validation steps documented for running Docker Desktop + **`docker compose up --build`**.
+
+---
+
+User:
+Docker build too slow — change Dockerfile and compose so API/web are built on the host (`mvn clean package`; `cnpm i && npm build`), images only contain runtime and copied artifacts.
+
+Assistant:
+**Runtime-only images:** **`jigsaw-api/Dockerfile`** — **`eclipse-temurin:17-jre-jammy`** + **`COPY target/jigsaw-api-0.0.1-SNAPSHOT.jar`**; **`jigsaw-web/Dockerfile`** — **`nginx:alpine`** + **`COPY dist/`** + **`nginx/default.conf`** (port **8000**). **`jigsaw-api/.dockerignore`** — **`target/*`** + exception **`!target/jigsaw-api-0.0.1-SNAPSHOT.jar`**; **`jigsaw-web/.dockerignore`** — removed ignoring **`dist/`**. **`docker-compose.yml`** / **`README.md`** — document host build then **`docker compose build`**. Documented **`npm run build`** (npm has no bare **`build`** script).
+
+---
+
+User:
+Simplify README delivery section: remove zip/git instructions (Day 1 delivery via compose + Hub); verification — put Docker Compose first, recommend pull + up for Hub images.
+
+Assistant:
+Rewrote **`README.md`** 「交付物说明」：删掉压缩包/Git 小节；用表格 + **`docker compose pull && docker compose up -d`** 作为主线；验证指南顺序为 **1 Hub** → **2 本地源码** → **3 本地打镜像**；Docker Hub 小节压缩为维护者登录/推送。
+
+---
+
 [End of record]

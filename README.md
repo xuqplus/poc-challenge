@@ -37,3 +37,65 @@
 |------|------|
 | 原 Web 前端仓库 | https://github.com/raas-jigsaw-web/raas-jigsaw-web.github.io |
 | Java 穷举求解参考 | https://github.com/xuqplus/calendar-jigsaw |
+
+---
+
+## 交付物说明（面试官场景）
+
+**Day 1 验证**：镜像已发布至 Docker Hub，直接用仓库根目录 **`docker-compose.yml`** 拉取并启动即可，无需本地编译。
+
+| 服务 | 说明 | 主机端口 |
+|------|------|----------|
+| **api** | Spring Boot（`/resolve` 等） | **8080** |
+| **web** | nginx 托管前端静态资源 | **8000** |
+
+前置：**Docker** + **Compose V2**（`docker compose`）。在**克隆后的仓库根目录**执行：
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+浏览器访问 **http://localhost:8000**；前端请求 **http://localhost:8080** 上的 API。停止：`docker compose down`。
+
+如需**本地改代码再打镜像**：先在宿主机执行 `mvn clean package -DskipTests`（`jigsaw-api`）、`cnpm i && npm run build`（`jigsaw-web`），再 `docker compose build && docker compose up -d`（当前 Dockerfile 仅打包运行环境与已编译产物）。
+
+### 架构决策与权衡（摘要）
+
+| 决策 | 理由 | 权衡 |
+|------|------|------|
+| API 用 Java 17 + Spring Boot | 与常见企业栈一致，便于测试与部署 | 较 Node 服务镜像体积更大 |
+| **Dockerfile 只做运行环境 + COPY 本地产物** | 宿主机 `mvn package` / `cnpm i && npm run build` 完成后，`docker build` 仅打包 JRE/nginx + jar/`dist`，镜像构建快 | 打镜像前必须手动执行一遍编译；版本升级时需同步 `Dockerfile` 中 jar 文件名 |
+| Web 镜像为 **nginx + 静态 `dist/`** | 无 Node 构建层，镜像小、构建快 | 静态资源必须在宿主机构建好 |
+
+可按面试要求在此段落后补充更细的模块边界、缓存（如 Caffeine）与 CORS 说明。
+
+### AI 协作说明（请按需填写）
+
+建议在提交前用几句话写明：
+
+- 哪些部分由 AI（如 Cursor）辅助（脚手架、Dockerfile 草稿、文案结构等）；
+- 你对生成内容做了哪些**关键修改**（安全校验、业务语义、测试、版本与端口约定等）。
+
+下方为占位示例，**请替换为你的真实过程**：
+
+> 示例：API 接口形状与测试用例由本人主导；AI 辅助生成初版 Dockerfile 与 README 小节，已在本机修正 Compose 端口、Maven 构建路径并手动验证构建命令。
+
+### 验证指南
+
+**1. Docker Compose + Hub（推荐）** — 与上文「交付物说明」一致：**`docker compose pull && docker compose up -d`**，无需本地编译；打开 **http://localhost:8000**，可选按控制器约定请求 **`/resolve`** 等接口。
+
+**2. 本地源码运行（调试）**
+
+```bash
+cd jigsaw-api && ./mvnw spring-boot:run
+cd jigsaw-web && pnpm install && pnpm run dev   # 另开终端；需已初始化 submodule
+```
+
+**3. 本地构建镜像（维护者）** — 先在 **`jigsaw-api`** / **`jigsaw-web`** 完成编译后：`docker compose build`，或单独 `docker build ./jigsaw-api`、`docker build ./jigsaw-web`（标签见下文）。
+
+### Docker Hub（镜像名与发布）
+
+- `qunqunxu398/jigsaw-api:poc`
+- `qunqunxu398/jigsaw-web:poc`
+
+发布：`docker login -u qunqunxu398`（建议用 Hub **Access Token**），然后 `docker compose build && docker compose push`。

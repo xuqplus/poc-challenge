@@ -1,0 +1,28 @@
+# Conversation log
+
+Human-readable transcript for substantive agent sessions. Rules: see `.cursor/rules/conversation-log.mdc`.
+
+---
+
+**2026-05-07 12:00 +0800**
+[User] Asked for Docker delivery: Dockerfiles for jigsaw-web & jigsaw-api, local validation, Docker Hub push (account qunqunxu398), docker-compose for reviewers.
+
+[Assistant] Added `jigsaw-api/Dockerfile` (Maven multi-stage → Temurin 17 JRE), `jigsaw-api/.dockerignore`, `jigsaw-web/Dockerfile` (pnpm build → nginx Alpine), `jigsaw-web/.dockerignore`, `jigsaw-web/nginx/default.conf` (SPA fallback), repo-root `docker-compose.yml` (api :8080, web :8081→80). Attempted `docker compose build`: Docker CLI at `/Applications/Docker.app/Contents/Resources/bin/docker`; Compose V2 plugin not present (`compose` not a docker command); Docker daemon not running (`Cannot connect to the Docker daemon`). Documented Hub login/tag/push and README delivery sections; local image build not executed successfully in this environment—reviewer should start Docker Desktop and run `docker compose up --build` or install Compose V2 plugin.
+
+---
+
+[User] Speed up Docker: build api/web on host (`mvn clean package`, `cnpm i && npm run build`), images only copy artifacts + runtime (JRE / nginx).
+
+[Assistant] Rewrote `jigsaw-api/Dockerfile` to single-stage Temurin JRE + `COPY target/jigsaw-api-0.0.1-SNAPSHOT.jar`; `jigsaw-web/Dockerfile` to nginx + `COPY dist/` and `nginx/default.conf`; adjusted `.dockerignore` files (include jar + `dist/`); updated `docker-compose.yml` header comments and README compose/trade-off sections.
+
+---
+
+[User] Shorten README delivery: drop zip/git (Day 1 via compose + Hub); verification leads with compose pull/up.
+
+[Assistant] README 「交付物说明」精简为 Hub + compose 主线；验证指南顺序 Hub → 本地源码 → 本地打镜像；去重 pull/up 命令块。
+
+---
+
+[User] commit, push
+
+[Assistant] Restored accidental **`jigsaw-web/pnpm-lock.yaml`** deletion before commit. Committed **`jigsaw-web`** Docker assets (**`Dockerfile`**, **`.dockerignore`**, **`nginx/default.conf`**). Parent repo: **`docker-compose.yml`**, **`jigsaw-api/Dockerfile`**, **`jigsaw-api/.dockerignore`**, **`README.md`**, **`conversation-record.txt`**, **`chat/conversation.txt`**; bumped submodule pointer; **`git push`** for submodule then parent (**`master`** / **`poc-challenge`**).

@@ -1,0 +1,9 @@
+# Ship only the fat JAR; keep other target/ clutter out of the build context
+target/*
+!target/jigsaw-api-0.0.1-SNAPSHOT.jar
+.idea/
+.mvn/
+HELP.md
+*.iml
+.git
+.gitignore
