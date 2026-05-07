@@ -1,0 +1,21 @@
+---
+description: Append substantive chat turns to conversation-record.txt; do this before commits when you ran the commit.
+alwaysApply: true
+---
+
+# Conversation log (this repo)
+
+**File:** `conversation-record.txt` at the repository root (not `chat/conversation.txt`).
+
+**When to update**
+
+- After **substantive** back-and-forth (decisions, tasks completed, commands run, failures).
+- **Before `git commit`** when you are committing project work: append the transcript for that session first, then stage **including** `conversation-record.txt`, then commit—unless the user explicitly skips the log.
+
+**How to write**
+
+- Prefer **append**; never overwrite unless the user asks to reset.
+- Use `---` between dated blocks. On the **first** `[User]` entry of a **new calendar day**, prefix that line with a marker: `**YYYY-MM-DD HH:mm +0800**` (date + time in **+0800**). Same day: plain `[User]` / `[Assistant]` lines in order.
+- Summarize: user intent, files touched, commands/results (e.g. install failures), and links—**no secrets, tokens, or keys**.
+
+This repo keeps a single rolling log in `conversation-record.txt`; keep entries concise.

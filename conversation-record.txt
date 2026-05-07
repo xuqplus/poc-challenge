@@ -11,4 +11,58 @@ Created this file (conversation-record.txt) to hold our conversation. You can ap
 
 ---
 
-[End of record at creation]
+**2026-05-07 22:00 +0800** (approx.; adjust if you need exact local time)
+
+User:
+create a txt file to record our conversation
+
+Assistant:
+Created conversation-record.txt at repo root for ongoing transcripts.
+
+---
+
+User:
+(README context in Chinese) Document Jigsaw hackathon, calendar-jigsaw Java solver, non-public AWS backend with pheromone-style optimization; goals — reimplement API, Docker/Compose, AI-assisted solver, benchmarks, JS/pure frontend.
+
+Assistant:
+Added README.md with background, links to raas-jigsaw-web frontend and xuqplus/calendar-jigsaw, and numbered goals.
+
+User:
+commit with proper message
+
+Assistant:
+Initial commit (README + conversation-record). Later amended author; push to GitHub initially blocked GH007 (private email); amended with GitHub noreply for push.
+
+User:
+configure git user.email and user.name (Autodesk / Qunqun Xu); amend commit; push
+
+Assistant:
+Set local user.email/name; amended commit; push needed noreply author again for GitHub.
+
+User:
+add calendar-jigsaw and raas-jigsaw-web.github.io as git submodules
+
+Assistant:
+Added submodules at calendar-jigsaw/ and raas-jigsaw-web.github.io/; committed chore with .gitmodules.
+
+User:
+analysis calendar-jigsaw, try to run Main.java
+
+Assistant:
+Compiled under Java 17 (src/), ran com.company.Main — exhaustive 10-piece bitmask solver for hard-coded date 11/11/2022; prints target grid and many solutions; full run can be very long.
+
+User:
+analysis raas-jigsaw-web; cnpm install and start
+
+Assistant:
+cnpm install failed postinstall (max setup: Cannot find module umi) — cnpm/npminstall layout vs @umijs/max. README notes yarn workflow; lockfile is pnpm. Suggested npm/pnpm with registry.npmmirror.com or Node LTS; npm reinstall was interrupted.
+
+User:
+don't forget to save the conversation txt, update cursor rules for this
+
+Assistant:
+Appended this log; added .cursor/rules/conversation-log.mdc — always apply; append to conversation-record.txt before commits when committing agent work.
+
+---
+
+[End of record]
