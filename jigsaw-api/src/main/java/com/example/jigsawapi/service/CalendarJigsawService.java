@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import org.springframework.stereotype.Service;
 
 /**
@@ -26,6 +28,15 @@ public class CalendarJigsawService {
 
     private static final int DEFAULT_MAX = 50;
     private static final int HARD_CAP = 500;
+
+    private final Cache<String, ResolveResponse> resolveResponseCache;
+
+    public CalendarJigsawService(Cache<String, ResolveResponse> resolveResponseCache) {
+        this.resolveResponseCache = resolveResponseCache;
+    }
+
+    /** Parsed query + normalized cache key ({@code d:yyyy-MM-dd|c:n} or {@code t:m:d:w|c:n}). */
+    private record SolverInputs(int month0, int day0, int weekSun0, int maxSolutions, String cacheKey) {}
 
     /** Month cells on board (0–11). Same layout as calendar-jigsaw Main. */
     private static final int[][] M = {
@@ -134,34 +145,43 @@ public class CalendarJigsawService {
      * </ul>
      */
     public ResolveResponse resolve(String date, Integer month, Integer day, Integer week, Integer count) {
-        int m;
-        int d;
-        int w;
+        SolverInputs in = buildSolverInputs(date, month, day, week, count);
+        return resolveResponseCache.get(in.cacheKey(), k -> computeResolve(in));
+    }
+
+    private SolverInputs buildSolverInputs(
+            String date, Integer month, Integer day, Integer week, Integer count) {
+        int max = count == null || count <= 0 ? DEFAULT_MAX : Math.min(count, HARD_CAP);
         if (date != null && !date.isBlank()) {
             LocalDate ld = parseDate(date.trim());
-            m = ld.getMonthValue() - 1;
-            d = ld.getDayOfMonth() - 1;
-            w = weekSun0(ld);
-        } else {
-            if (month == null || day == null || week == null) {
-                throw new IllegalArgumentException(
-                        "Provide either `date` or all of `month`, `day`, `week` (see README).");
-            }
-            if (month < 0 || month > 11) {
-                throw new IllegalArgumentException("month must be 0–11");
-            }
-            if (day < 0 || day > 30) {
-                throw new IllegalArgumentException("day must be 0–30 (0 = 1st)");
-            }
-            if (week < 0 || week > 6) {
-                throw new IllegalArgumentException("week must be 0–6 (0 = Sunday)");
-            }
-            m = month;
-            d = day;
-            w = week;
+            int m = ld.getMonthValue() - 1;
+            int d = ld.getDayOfMonth() - 1;
+            int w = weekSun0(ld);
+            String key = "d:" + ld + "|c:" + max;
+            return new SolverInputs(m, d, w, max, key);
         }
+        if (month == null || day == null || week == null) {
+            throw new IllegalArgumentException(
+                    "Provide either `date` or all of `month`, `day`, `week` (see README).");
+        }
+        if (month < 0 || month > 11) {
+            throw new IllegalArgumentException("month must be 0–11");
+        }
+        if (day < 0 || day > 30) {
+            throw new IllegalArgumentException("day must be 0–30 (0 = 1st)");
+        }
+        if (week < 0 || week > 6) {
+            throw new IllegalArgumentException("week must be 0–6 (0 = Sunday)");
+        }
+        String key = "t:" + month + ":" + day + ":" + week + "|c:" + max;
+        return new SolverInputs(month, day, week, max, key);
+    }
 
-        int max = count == null || count <= 0 ? DEFAULT_MAX : Math.min(count, HARD_CAP);
+    private ResolveResponse computeResolve(SolverInputs in) {
+        int m = in.month0();
+        int d = in.day0();
+        int w = in.weekSun0();
+        int max = in.maxSolutions();
 
         int[][] target = buildTargetMatrix(m, d, w);
         Map<String, Set<Long>> placementMap = buildPlacementMap(target);
@@ -255,6 +275,11 @@ public class CalendarJigsawService {
                 w,
                 solutions.size(),
                 solutions);
+    }
+
+    /** For tests / observability (Caffeine {@code recordStats()}). */
+    public CacheStats resolveCacheStats() {
+        return resolveResponseCache.stats();
     }
 
     static int[][] buildTargetMatrix(int monthIndex, int dayIndex, int weekSun0) {

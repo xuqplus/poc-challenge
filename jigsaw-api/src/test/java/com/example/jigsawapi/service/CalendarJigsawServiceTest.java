@@ -5,10 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.example.jigsawapi.dto.ResolveResponse;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 class CalendarJigsawServiceTest {
+
+    private static CalendarJigsawService newService() {
+        return new CalendarJigsawService(Caffeine.newBuilder().recordStats().build());
+    }
 
     @Test
     void weekSun0_matchesJsDateGetDay() {
@@ -27,7 +32,7 @@ class CalendarJigsawServiceTest {
 
     @Test
     void resolve_byDate_returnsSolutions() {
-        CalendarJigsawService svc = new CalendarJigsawService();
+        CalendarJigsawService svc = newService();
         ResolveResponse r = svc.resolve("11/11/2022", null, null, null, 4);
         assertEquals(0, r.code());
         assertEquals(10, r.month());
@@ -43,7 +48,7 @@ class CalendarJigsawServiceTest {
 
     @Test
     void resolve_byReadmeParams_equivalentToDate() {
-        CalendarJigsawService svc = new CalendarJigsawService();
+        CalendarJigsawService svc = newService();
         ResolveResponse a = svc.resolve(null, 10, 10, 5, 2);
         ResolveResponse b = svc.resolve("11/11/2022", null, null, null, 2);
         assertEquals(a.month(), b.month());
@@ -54,7 +59,7 @@ class CalendarJigsawServiceTest {
 
     @Test
     void resolve_requiresParamsOrDate() {
-        CalendarJigsawService svc = new CalendarJigsawService();
+        CalendarJigsawService svc = newService();
         assertThrows(IllegalArgumentException.class, () -> svc.resolve(null, null, null, null, 1));
         assertThrows(IllegalArgumentException.class, () -> svc.resolve(null, 0, null, 0, 1));
     }

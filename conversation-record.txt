@@ -111,4 +111,20 @@ Assistant:
 
 ---
 
+User:
+需要在 API 中支持跨域（CORS）。
+
+Assistant:
+**jigsaw-api**：新增 **`WebConfig`**（`WebMvcConfigurer.addCorsMappings`），对 **`/**`** 允许 **`http(s)://localhost:*`**、**`127.0.0.1:*`** 等 **`allowedOriginPatterns`**，常用方法与 **`OPTIONS`** 预检；**`CorsIntegrationTest`** 校验 **`ACCESS_CONTROL_ALLOW_ORIGIN`**。
+
+---
+
+User:
+实现 API 结果缓存（/resolve）。
+
+Assistant:
+**jigsaw-api**：Caffeine **`Cache<String,ResolveResponse>`**（**`ResolveResponseCacheConfig`**：`maximumSize`、`expireAfterAccess`，可配置 **`jigsaw.cache.resolve.*`**）；**`CalendarJigsawService`** 规范化键 **`d:{ISO-date}|c:{cap}`** / **`t:{m}:{d}:{w}|c:{cap}`**，**`computeResolve`** 仅在未命中时执行；**`resolveCacheStats()`** 便于观测；测试 **`ResolveResponseCacheTest`**。
+
+---
+
 [End of record]

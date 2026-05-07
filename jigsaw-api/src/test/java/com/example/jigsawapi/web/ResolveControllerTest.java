@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.jigsawapi.service.CalendarJigsawService;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,8 +18,9 @@ class ResolveControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc =
-                MockMvcBuilders.standaloneSetup(new ResolveController(new CalendarJigsawService())).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(
+                        new ResolveController(new CalendarJigsawService(Caffeine.newBuilder().build())))
+                .build();
     }
 
     @Test
