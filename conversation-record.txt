@@ -65,4 +65,24 @@ Appended this log; added .cursor/rules/conversation-log.mdc — always apply; ap
 
 ---
 
+**2026-05-07 23:30 +0800** (approx.)
+
+User:
+npm build attempt; npm start dev server on port 8001; commit and push submodules on branch poc-challenge
+
+Assistant:
+Build failed missing prop-types/styled-components/dayjs — added to raas-jigsaw-web package.json. User ran cnpm manually; npm start succeeded (localhost:8001). Created branches **poc-challenge** on calendar-jigsaw (.gitignore `*.class`, commit 42e7406) and raas-jigsaw-web.github.io (deps fix, commit b9dcf54), pushed both to origin. Parent repo updated submodule pointers.
+
+---
+
+**2026-05-07 session (submodule / parent push order)**
+
+User:
+Commit with proper messages: for submodules create branches `poc-challenge`, push to remote; commit and push submodules first, then parent.
+
+Assistant:
+Ran **`git push origin poc-challenge`** in **calendar-jigsaw** and **raas-jigsaw-web.github.io** — both reported **Everything up-to-date** (remote already had branch **poc-challenge**). Parent repo **master** was already aligned with **origin/master** at **f8ffe2d** (*chore: point submodules at poc-challenge branches*), submodule pointers **42e7406** (Java: ignore `*.class`) and **b9dcf54** (frontend: explicit **dayjs**, **prop-types**, **styled-components**). Restored **conversation-record.txt** working copy where a section had been removed vs **HEAD**.
+
+---
+
 [End of record]
