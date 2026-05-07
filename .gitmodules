@@ -1,6 +1,6 @@
 [submodule "calendar-jigsaw"]
 	path = calendar-jigsaw
 	url = https://github.com/xuqplus/calendar-jigsaw.git
-[submodule "raas-jigsaw-web.github.io"]
-	path = raas-jigsaw-web.github.io
+[submodule "jigsaw-web"]
+	path = jigsaw-web
 	url = https://github.com/raas-jigsaw-web/raas-jigsaw-web.github.io.git

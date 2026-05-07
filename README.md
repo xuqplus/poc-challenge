@@ -6,7 +6,7 @@
 
 ### Jigsaw（Hackathon）
 
-- **Web 前端（已开源）**：[raas-jigsaw-web/raas-jigsaw-web.github.io](https://github.com/raas-jigsaw-web/raas-jigsaw-web.github.io)
+- **Web 前端（已开源）**：[raas-jigsaw-web/raas-jigsaw-web.github.io](https://github.com/raas-jigsaw-web/raas-jigsaw-web.github.io)（本仓库子模块目录名：`jigsaw-web/`）
 - **后端 API**：未开源，需部署在内部 AWS 环境，因此无法直接复用。
 
 ### 灵感与早期实现

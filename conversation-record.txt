@@ -103,4 +103,12 @@ Implemented **`CalendarJigsawService`** + **`MatrixUtil`** (from calendar-jigsaw
 
 ---
 
+User:
+Rename submodule folder **raas-jigsaw-web.github.io** → **jigsaw-web**; set Jigsaw API URL in web project to **localhost:8080**.
+
+Assistant:
+**git mv** to **`jigsaw-web/`**; **`.gitmodules`** submodule **`jigsaw-web`**. In **`jigsaw-web`** Play13/Play14 **`Backboard.Url`** → **`http://localhost:8080`**. README notes submodule path.
+
+---
+
 [End of record]
