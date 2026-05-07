@@ -46,8 +46,8 @@
 
 | 服务 | 说明 | 主机端口 |
 |------|------|----------|
-| **api** | Spring Boot（`/resolve` 等） | **8080** |
-| **web** | nginx 托管前端静态资源 | **8000** |
+| **api** | Spring Boot（`/resolve` 等） | [http://localhost:8080](http://localhost:8080) |
+| **web** | nginx 托管前端静态资源 | [http://localhost:8000](http://localhost:8000) |
 
 前置：**Docker** + **Compose V2**（`docker compose`）。在**克隆后的仓库根目录**执行：
 
@@ -55,7 +55,7 @@
 docker compose pull && docker compose up -d
 ```
 
-浏览器访问 **http://localhost:8000**；前端请求 **http://localhost:8080** 上的 API。停止：`docker compose down`。
+浏览器访问 [http://localhost:8000](http://localhost:8000)；前端请求 [http://localhost:8080](http://localhost:8080) 上的 API。停止：`docker compose down`。
 
 如需**本地改代码再打镜像**：先在宿主机执行 `mvn clean package -DskipTests`（`jigsaw-api`）、`cnpm i && npm run build`（`jigsaw-web`），再 `docker compose build && docker compose up -d`（当前 Dockerfile 仅打包运行环境与已编译产物）。
 
@@ -82,7 +82,7 @@ docker compose pull && docker compose up -d
 
 ### 验证指南
 
-**1. Docker Compose + Hub（推荐）** — 与上文「交付物说明」一致：**`docker compose pull && docker compose up -d`**，无需本地编译；打开 **http://localhost:8000**，可选按控制器约定请求 **`/resolve`** 等接口。
+**1. Docker Compose + Hub（推荐）** — 与上文「交付物说明」一致：**`docker compose pull && docker compose up -d`**，无需本地编译；前端 [http://localhost:8000](http://localhost:8000)，API [http://localhost:8080](http://localhost:8080)；可选按控制器约定请求 **`/resolve`** 等接口。
 
 **2. 本地源码运行（调试）**
 

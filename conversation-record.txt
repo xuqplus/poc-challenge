@@ -159,4 +159,12 @@ Committed **`jigsaw-web`** submodule (**Dockerfile**, **nginx/default.conf**, **
 
 ---
 
+User:
+Fix README `http://localhost:8000` / `8080` link display; commit and push.
+
+Assistant:
+**`README.md`**: Markdown links for localhost in prose, service table, and verification; **`git commit`** + **`git push`** **`origin/master`**.
+
+---
+
 [End of record]
