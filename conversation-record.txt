@@ -95,4 +95,12 @@ Added **`jigsaw-api/`** (Spring Boot skeleton under `com.example.jigsawapi`). Up
 
 ---
 
+User:
+Port calendar-jigsaw solver into Jigsaw-api as one service; follow raas-jigsaw-web README / Play14 IO; add Spring tests.
+
+Assistant:
+Implemented **`CalendarJigsawService`** + **`MatrixUtil`** (from calendar-jigsaw), **`GET /resolve`** (`ResolveController`): supports **`date`** (Play14: MM/DD/YYYY or ISO) or **`month`/`day`/`week`** + **`count`** (cap default 50, hard cap 500). JSON **`ResolveResponse`** includes **`code`**, **`month`/`day`/`week`**, **`count`**, **`data[]`** with **`matrix`** 8×7 strings (**`"`** for calendar holes, **A–J** for pieces). Dedupe via sorted placement masks. Tests: **`CalendarJigsawServiceTest`**, **`ResolveControllerTest`** (standalone MockMvc). Added **`spring-boot-starter-json`**, **`spring-boot-starter-test`**; **`server.port=8080`**.
+
+---
+
 [End of record]
