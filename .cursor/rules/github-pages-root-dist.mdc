@@ -1,0 +1,32 @@
+---
+description: Sync jigsaw-web dist to repo-root dist/ after production build and before Docker web image build/push (GitHub Pages).
+alwaysApply: true
+---
+
+# Web `dist/` at repository root (GitHub Pages)
+
+## Rule
+
+1. **After** a production build of the web app (`cd jigsaw-web && cnpm i && cnpm run build`), **always** run from the **repository root**:
+
+   ```bash
+   ./scripts/sync-web-dist-to-root.sh
+   ```
+
+   This copies `jigsaw-web/dist/` → **`dist/`** at the repo root (overwrite). The root `dist/` tree is intended for **GitHub Pages** static hosting and should stay aligned with what the nginx Docker image ships.
+
+2. **Whenever** rebuilding/publishing Docker images for Hub—especially **`jigsaw-web`**—use an ordering like:
+
+   - `jigsaw-api`: `./mvnw clean package -DskipTests` (or equivalent)
+   - `jigsaw-web`: `cnpm i && cnpm run build`
+   - **Root**: `./scripts/sync-web-dist-to-root.sh`
+   - **Docker**: `docker compose build` / `docker compose push` (or targeted `web` service)
+
+   Do **not** skip the sync step when the web bundle changed: committed root `dist/` and the image should reflect the same build.
+
+3. If the user updates only submodule `jigsaw-web` and builds there, still run the sync before committing root changes so Pages and Docker stay consistent.
+
+## Rationale
+
+- **GitHub Pages** can consume the static files under repo-root `dist/` (e.g. via Actions workflow or project-specific Pages configuration).
+- Keeping **`dist/` at root** avoids coupling Pages layout to the submodule path `jigsaw-web/dist`.

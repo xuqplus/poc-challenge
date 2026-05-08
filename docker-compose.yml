@@ -2,7 +2,8 @@
 #
 # Build artifacts on the host first (fast Docker builds — image only bundles runtime):
 #   cd jigsaw-api && mvn clean package -DskipTests
-#   cd jigsaw-web && cnpm i && npm run build
+#   cd jigsaw-web && cnpm i && cnpm run build
+#   ./scripts/sync-web-dist-to-root.sh   # jigsaw-web/dist -> repo-root dist/ (GitHub Pages)
 # Then:
 #   docker compose build && docker compose up -d
 #

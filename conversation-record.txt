@@ -247,4 +247,12 @@ Assistant:
 
 ---
 
+User:
+commit, push（仓库根 **`dist/`** 同步脚本与 GitHub Pages 文档、演示链接简化等）
+
+Assistant:
+**`scripts/sync-web-dist-to-root.sh`**、**`.cursor/rules/github-pages-root-dist.mdc`**；提交根目录 **`dist/`**；**`README.md`** / **`docker-compose.yml`** 与 **`jigsaw-web`**（Dockerfile、README）约定 **`cnpm run build`** 后同步再 Docker；README 「演示前端」链到 **`https://xuqplus.github.io/poc-challenge/`** 与 play14/15，并写明 **`dist/`**；更新 **`conversation-record.txt`**、**`chat/conversation.txt`**。子模块 **`jigsaw-web`** 先提交再更新父仓库指针并 **`git push`**。
+
+---
+
 [End of record]

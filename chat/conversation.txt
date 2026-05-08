@@ -62,3 +62,17 @@ Human-readable transcript for substantive agent sessions. Rules: see `.cursor/ru
 [User] MRV LCV + benchmark paired dirs + web menu labels + fix **`menu.play.play.play15`** via route **`name`**.
 
 [Assistant] **`CalendarJigsawMrvService`** LCV / prune / **`trialOrder`**; **`benchmark-artifacts/paired/`**; **`BENCHMARK_DAY2.md`**; **`jigsaw-web`** **`routes.ts`** (`play01`–`play15`) + **`menu.play.play14`**/**`play15`**.
+
+---
+
+**2026-05-07**
+
+[User] Sync **`jigsaw-web/dist`** → repo-root **`dist/`** for GitHub Pages; Cursor rule; **`cnpm run build`** in Docker docs; README demo links to **`https://xuqplus.github.io/poc-challenge/`**; simplify 「演示前端」copy.
+
+[Assistant] **`scripts/sync-web-dist-to-root.sh`**, **`.cursor/rules/github-pages-root-dist.mdc`**; **`README.md`**, **`docker-compose.yml`**, **`jigsaw-web/Dockerfile`** + **`README.md`**; committed **`dist/`** mirror.
+
+---
+
+[User] commit, push
+
+[Assistant] Append **`chat/conversation.txt`** / **`conversation-record.txt`**; commit **`jigsaw-web`** submodule then root (**`dist/`**, **`scripts/`**, rules, README, compose); **`git push`** submodule + parent **`master`**.
