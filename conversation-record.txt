@@ -223,4 +223,20 @@ Updated **`conversation-log.mdc`**: require **`chat/conversation.txt`** and **`c
 
 ---
 
+User:
+针对优化后的算法进行基准线对比测试，保留元数据，生成测试报告，放到之前的报告里进行对比
+
+Assistant:
+Added **`BenchmarkScenarioPlanner`** / **`BenchmarkCsvSupport`**, **`SolverComparisonBenchmarkIT`** (`-Djigsaw.benchmark.compare=true`); refactored **`SolverBaselineBenchmarkIT`** with **`solver`** column; **`scripts/compare_benchmark_csvs.py`**; extended **`summarize_benchmark_csv.py`**. Ran paired exhaustive vs MRV benchmark; updated **`BENCHMARK_DAY2.md`** with paired metadata + comparison tables + archived Day2 exhaustive section.
+
+---
+
+User:
+测试结果元数据被 git ignore 了，作为 POC 演示，将 CSV 结果一并提交到 git，在 api 项目下新建目录存放
+
+Assistant:
+Added **`jigsaw-api/benchmark-artifacts/`** with committed CSV + **`summarize_benchmark_csv.py`** reports (paired exhaustive/MRV + archived **`solver-baseline`** run), **`README.md`**; updated **`BENCHMARK_DAY2.md`** paths and reproduction snippets.
+
+---
+
 [End of record]

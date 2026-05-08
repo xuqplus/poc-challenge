@@ -50,3 +50,9 @@ Human-readable transcript for substantive agent sessions. Rules: see `.cursor/ru
 [User] Update rules: before commit always record **`chat/conversation.txt`** to avoid needing a second commit for logs.
 
 [Assistant] Revised **`.cursor/rules/conversation-log.mdc`** and **`git-commit-submodules.mdc`**: pre-commit append **`chat/conversation.txt`** + **`conversation-record.txt`** with substantive session work; single commit with code + logs.
+
+---
+
+[User] Commit benchmark CSV under **`jigsaw-api`** for POC (was under **`target/`**, gitignored).
+
+[Assistant] Created **`jigsaw-api/benchmark-artifacts/`** with paired exhaustive/MRV CSV + reports + archived baseline CSV, **`README.md`**; **`BENCHMARK_DAY2.md`** points to **`benchmark-artifacts/`**.

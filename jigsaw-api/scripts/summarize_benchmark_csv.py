@@ -27,6 +27,7 @@ def main() -> None:
 
     run_id = rows[0]["run_id"]
     seed = rows[0]["random_seed"]
+    solver = rows[0].get("solver") or "(legacy CSV, solver column absent)"
     by_scene: dict[str, list[dict[str, str]]] = defaultdict(list)
     for r in rows:
         by_scene[r["scenario_id"]].append(r)
@@ -36,6 +37,7 @@ def main() -> None:
     out.append(f"- **CSV**：`{path.name if path else '(stdin)'}`\n")
     out.append(f"- **run_id**：`{run_id}`\n")
     out.append(f"- **random_seed**：{seed}\n")
+    out.append(f"- **solver**：{solver}\n")
     out.append(f"- **总行数（数据行）**：{len(rows)}\n")
     out.append("\n---\n")
 
