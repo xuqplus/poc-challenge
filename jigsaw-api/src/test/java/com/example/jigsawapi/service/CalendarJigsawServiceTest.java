@@ -2,7 +2,9 @@ package com.example.jigsawapi.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.jigsawapi.dto.ResolveResponse;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -39,6 +41,7 @@ class CalendarJigsawServiceTest {
         assertEquals(10, r.day());
         assertEquals(5, r.week());
         assertEquals(4, r.count());
+        assertEquals(4, r.requestedCount().intValue());
         assertEquals(4, r.data().size());
         assertFalse(r.data().isEmpty());
         var m = r.data().get(0).matrix();
@@ -62,5 +65,17 @@ class CalendarJigsawServiceTest {
         CalendarJigsawService svc = newService();
         assertThrows(IllegalArgumentException.class, () -> svc.resolve(null, null, null, null, 1));
         assertThrows(IllegalArgumentException.class, () -> svc.resolve(null, 0, null, 0, 1));
+    }
+
+    @Test
+    void resolve_withTimeout_hasRequestedCount_andBoundedPartial() {
+        CalendarJigsawService svc = newService();
+        ResolveResponse r = svc.resolve("11/11/2022", null, null, null, 100, 1L);
+        assertEquals(100, r.requestedCount().intValue());
+        assertTrue(r.count() <= 100);
+        assertNotNull(r.timedOut());
+        if (Boolean.TRUE.equals(r.timedOut())) {
+            assertEquals("partial_timeout", r.message());
+        }
     }
 }

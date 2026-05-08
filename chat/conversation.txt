@@ -32,3 +32,9 @@ Human-readable transcript for substantive agent sessions. Rules: see `.cursor/ru
 [User] README localhost URLs rendered poorly on GitHub; fix **`**http://...**`**; then table + verification use explicit markdown links; commit + push.
 
 [Assistant] **`README.md`**: replaced bold-wrapped URLs with **`[url](url)`**; service table ports → localhost links; verification lists both Web and API URLs. Committed and pushed **`master`** with **`xuqplus@users.noreply.github.com`**.
+
+---
+
+[User] commit (Day 2 baseline: timeout/partial solve, benchmark IT, CSV summarize script, **`BENCHMARK_DAY2.md`**).
+
+[Assistant] Staging **`jigsaw-api`** DTOs (**`SolveOutcome`**, **`SolveStatistics`**), **`ResolveResponse`** / **`CalendarJigsawService`** / **`ResolveController`** timeout path, **`SolverBaselineBenchmarkIT`**, **`scripts/summarize_benchmark_csv.py`**, **`BENCHMARK_DAY2.md`**, **`conversation-record.txt`**, **`chat/conversation.txt`**; **`git commit`** with **`xuqplus@users.noreply.github.com`**.

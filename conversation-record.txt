@@ -167,4 +167,28 @@ Assistant:
 
 ---
 
+User:
+Day 2 baseline benchmarks: three scenarios (100×1, 10×10, 1×100 solves), timeout partial results, CSV metadata, Spring Boot tests, cache off via resolveForBenchmark.
+
+Assistant:
+**`ResolveResponse`**: added **`requestedCount`**, **`timedOut`** (Jackson **`@JsonInclude(NON_NULL)`**). **`SolveStatistics`**, **`SolveOutcome`**. **`CalendarJigsawService`**: **`computeResolve`** accepts deadline (`Long` nanos), counts overlap/dedupe/leaf/emitted; **`resolve(..., timeoutMsPerSolution)`** bypasses cache when set — budget **`timeoutMsPerSolution * requestedCount`** ms; **`resolveForBenchmark`** uncached. **`GET /resolve`**: optional **`timeoutMsPerSolution`**. **`SolverBaselineBenchmarkIT`**: CSV under **`target/benchmark-results/`**, enabled with **`-Djigsaw.benchmark=true`**.
+
+---
+
+User:
+Run baseline benchmark, output CSV, summarize CSV into report.
+
+Assistant:
+Ran **`mvn test -Djigsaw.benchmark=true -Dtest=SolverBaselineBenchmarkIT`** (~127s); CSV **`target/benchmark-results/solver-baseline-*.csv`**. Added **`scripts/summarize_benchmark_csv.py`** → Markdown **`solver-baseline-*-report.md`** (per-scenario totals, wall times, overlap sums).
+
+---
+
+User:
+Add Day 2 baseline results as Markdown tables in a separate file at repo root.
+
+Assistant:
+Added **`BENCHMARK_DAY2.md`** with meta table, three-scenario comparison, global totals, and counter totals (same numbers as **`solver-baseline-1778242272227-report.md`**).
+
+---
+
 [End of record]

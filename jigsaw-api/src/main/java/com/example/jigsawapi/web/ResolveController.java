@@ -24,15 +24,22 @@ public class ResolveController {
      *   <li>{@code ?month=&day=&week=&count=} per README (0-based month/day, Sun=0 week)
      * </ul>
      */
+    /**
+     * @param timeoutMsPerSolution optional wall-clock budget per requested solution; total budget is {@code
+     *     timeoutMsPerSolution * count} ms. When set, response is not cached and may return fewer solutions if time
+     *     expires ({@code timedOut=true}, {@code message=partial_timeout}).
+     */
     @GetMapping("/resolve")
     public ResponseEntity<ResolveResponse> resolve(
             @RequestParam(required = false) String date,
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer day,
             @RequestParam(required = false) Integer week,
-            @RequestParam(required = false) Integer count) {
+            @RequestParam(required = false) Integer count,
+            @RequestParam(required = false) Long timeoutMsPerSolution) {
         try {
-            return ResponseEntity.ok(calendarJigsawService.resolve(date, month, day, week, count));
+            return ResponseEntity.ok(
+                    calendarJigsawService.resolve(date, month, day, week, count, timeoutMsPerSolution));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(ResolveResponse.error(1, ex.getMessage()));
         }

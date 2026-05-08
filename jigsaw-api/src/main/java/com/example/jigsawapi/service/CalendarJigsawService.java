@@ -2,6 +2,8 @@ package com.example.jigsawapi.service;
 
 import com.example.jigsawapi.dto.ResolveResponse;
 import com.example.jigsawapi.dto.SolutionDto;
+import com.example.jigsawapi.dto.SolveOutcome;
+import com.example.jigsawapi.dto.SolveStatistics;
 import com.example.jigsawapi.jigsaw.MatrixUtil;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -144,9 +146,42 @@ public class CalendarJigsawService {
      *   <li>else {@code month} (0–11), {@code day} (0–30), {@code week} (0–6, Sun=0)
      * </ul>
      */
+    /**
+     * Cached resolve (no deadline). Use {@link #resolve(String, Integer, Integer, Integer, Integer, Long)} with a
+     * per-solution budget to cap wall time and allow partial results.
+     */
     public ResolveResponse resolve(String date, Integer month, Integer day, Integer week, Integer count) {
+        return resolve(date, month, day, week, count, null);
+    }
+
+    /**
+     * @param timeoutMsPerSolution if not null and positive, total wall-time budget is {@code timeoutMsPerSolution *
+     *     requestedCount} ms; result is not cached. Returns partial solutions if the deadline is hit.
+     */
+    public ResolveResponse resolve(
+            String date, Integer month, Integer day, Integer week, Integer count, Long timeoutMsPerSolution) {
         SolverInputs in = buildSolverInputs(date, month, day, week, count);
-        return resolveResponseCache.get(in.cacheKey(), k -> computeResolve(in));
+        if (timeoutMsPerSolution != null && timeoutMsPerSolution > 0) {
+            long budgetMs = timeoutMsPerSolution * (long) in.maxSolutions();
+            long deadlineNanos = System.nanoTime() + budgetMs * 1_000_000L;
+            return computeResolve(in, deadlineNanos).response();
+        }
+        return resolveResponseCache.get(in.cacheKey(), k -> computeResolve(in, null).response());
+    }
+
+    /**
+     * Uncached solve with optional deadline budget (for benchmarks). When {@code timeoutMsPerSolution} is null,
+     * runs until exhaustive finish (no timeout).
+     */
+    public SolveOutcome resolveForBenchmark(
+            String date, Integer month, Integer day, Integer week, Integer count, Long timeoutMsPerSolution) {
+        SolverInputs in = buildSolverInputs(date, month, day, week, count);
+        Long deadlineNanos = null;
+        if (timeoutMsPerSolution != null && timeoutMsPerSolution > 0) {
+            long budgetMs = timeoutMsPerSolution * (long) in.maxSolutions();
+            deadlineNanos = System.nanoTime() + budgetMs * 1_000_000L;
+        }
+        return computeResolve(in, deadlineNanos);
     }
 
     private SolverInputs buildSolverInputs(
@@ -177,7 +212,11 @@ public class CalendarJigsawService {
         return new SolverInputs(month, day, week, max, key);
     }
 
-    private ResolveResponse computeResolve(SolverInputs in) {
+    private static boolean pastDeadline(Long deadlineNanos) {
+        return deadlineNanos != null && System.nanoTime() >= deadlineNanos;
+    }
+
+    private SolveOutcome computeResolve(SolverInputs in, Long deadlineNanos) {
         int m = in.month0();
         int d = in.day0();
         int w = in.weekSun0();
@@ -199,59 +238,80 @@ public class CalendarJigsawService {
 
         List<SolutionDto> solutions = new ArrayList<>();
         Set<String> dedupe = new LinkedHashSet<>();
+        MutableSolverStats stats = new MutableSolverStats();
+        boolean timedOut = false;
 
         search:
         for (Long a : aa) {
+            if (pastDeadline(deadlineNanos)) {
+                timedOut = true;
+                break search;
+            }
             for (Long b : bb) {
                 if ((a & b) != 0) {
+                    stats.overlapRejects++;
                     continue;
                 }
                 long b0 = a | b;
                 for (Long c : cc) {
                     if ((b0 & c) != 0) {
+                        stats.overlapRejects++;
                         continue;
                     }
                     long c0 = b0 | c;
                     for (Long dL : dd) {
                         if ((c0 & dL) != 0) {
+                            stats.overlapRejects++;
                             continue;
                         }
                         long d0 = c0 | dL;
                         for (Long e : ee) {
                             if ((d0 & e) != 0) {
+                                stats.overlapRejects++;
                                 continue;
                             }
                             long e0 = d0 | e;
                             for (Long f : ff) {
                                 if ((e0 & f) != 0) {
+                                    stats.overlapRejects++;
                                     continue;
                                 }
                                 long f0 = e0 | f;
                                 for (Long g : gg) {
                                     if ((f0 & g) != 0) {
+                                        stats.overlapRejects++;
                                         continue;
                                     }
                                     long g0 = f0 | g;
                                     for (Long h : hh) {
                                         if ((g0 & h) != 0) {
+                                            stats.overlapRejects++;
                                             continue;
                                         }
                                         long h0 = g0 | h;
                                         for (Long i : ii) {
                                             if ((h0 & i) != 0) {
+                                                stats.overlapRejects++;
                                                 continue;
                                             }
                                             long i0 = h0 | i;
                                             for (Long j : jj) {
+                                                if (pastDeadline(deadlineNanos)) {
+                                                    timedOut = true;
+                                                    break search;
+                                                }
                                                 if ((i0 & j) == 0) {
+                                                    stats.leafCandidates++;
                                                     long[] sorted = new long[] {a, b, c, dL, e, f, g, h, i, j};
                                                     Arrays.sort(sorted);
-                                                    String key = Arrays.toString(sorted);
-                                                    if (!dedupe.add(key)) {
+                                                    String dedupeKey = Arrays.toString(sorted);
+                                                    if (!dedupe.add(dedupeKey)) {
+                                                        stats.dedupeRejects++;
                                                         continue;
                                                     }
                                                     solutions.add(
                                                             overlaySolution(target, a, b, c, dL, e, f, g, h, i, j));
+                                                    stats.solutionsEmitted++;
                                                     if (solutions.size() >= max) {
                                                         break search;
                                                     }
@@ -267,14 +327,33 @@ public class CalendarJigsawService {
             }
         }
 
-        return new ResolveResponse(
-                0,
-                "ok",
-                m,
-                d,
-                w,
-                solutions.size(),
-                solutions);
+        String msg =
+                timedOut && solutions.size() < max ? "partial_timeout" : "ok";
+        ResolveResponse response =
+                new ResolveResponse(
+                        0,
+                        msg,
+                        m,
+                        d,
+                        w,
+                        solutions.size(),
+                        solutions,
+                        max,
+                        timedOut && solutions.size() < max ? Boolean.TRUE : Boolean.FALSE);
+        SolveStatistics st =
+                new SolveStatistics(
+                        stats.overlapRejects,
+                        stats.dedupeRejects,
+                        stats.leafCandidates,
+                        stats.solutionsEmitted);
+        return new SolveOutcome(response, st);
+    }
+
+    private static final class MutableSolverStats {
+        long overlapRejects;
+        long dedupeRejects;
+        long leafCandidates;
+        long solutionsEmitted;
     }
 
     /** For tests / observability (Caffeine {@code recordStats()}). */
