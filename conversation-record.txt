@@ -191,4 +191,36 @@ Added **`BENCHMARK_DAY2.md`** with meta table, three-scenario comparison, global
 
 ---
 
+User:
+Implement plan A (MRV + forward checking) as new service without replacing exhaustive solver.
+
+Assistant:
+Added **`JigsawPlacementCatalog`** (shared ELEMENTS + **`buildPlacementMap`**), **`SolverInputs`** + **`SolverInputsParser`**; refactored **`CalendarJigsawService`** to use them. New **`CalendarJigsawMrvService`**: MRV piece ordering + forward prune + DFS; **`resolve` / `resolveForBenchmark`** mirror legacy API (no cache). **`GET /resolve?solver=mrv`**. Tests **`CalendarJigsawMrvServiceTest`** (same solution count as exhaustive for sample date), **`ResolveControllerTest`** mrv case.
+
+---
+
+User:
+Add jigsaw-web route: copy Play13 demo but call optimized API (solver=mrv).
+
+Assistant:
+**`jigsaw-web`**: new **`src/pages/Play/Play15/index.tsx`** (reuses **`Play13`** `Square` + `Block`); fetch **`/resolve?...&solver=mrv`**. **`config/routes.ts`**: **`/play/play15`**. Locales **`pages.play15.hint`**, **`menu.play.play15`** (en-US + zh-CN).
+
+---
+
+User:
+add, commit, 增加rule, 每当说commit时，默认提交submodules, 然后提交root project
+
+Assistant:
+Added **`.cursor/rules/git-commit-submodules.mdc`** (`alwaysApply: true`): default workflow when the user asks to **commit** is commit each dirty **git submodule** listed in **`.gitmodules`** first, then commit the **root** repo (including updated submodule pointers). Coordinate with **`conversation-log.mdc`** for **`conversation-record.txt`**. Committed the rule file and this log entry.
+
+---
+
+User:
+增加/修改rule, commit 前先记录conversation.txt, 避免需要重复commit
+
+Assistant:
+Updated **`conversation-log.mdc`**: require **`chat/conversation.txt`** and **`conversation-record.txt`** before **`git commit`** for substantive work; stage logs in the **same** commit as code to avoid a second log-only commit. Updated **`git-commit-submodules.mdc`**: step **0** append logs, then submodules, then root.
+
+---
+
 [End of record]

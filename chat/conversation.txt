@@ -38,3 +38,15 @@ Human-readable transcript for substantive agent sessions. Rules: see `.cursor/ru
 [User] commit (Day 2 baseline: timeout/partial solve, benchmark IT, CSV summarize script, **`BENCHMARK_DAY2.md`**).
 
 [Assistant] Staging **`jigsaw-api`** DTOs (**`SolveOutcome`**, **`SolveStatistics`**), **`ResolveResponse`** / **`CalendarJigsawService`** / **`ResolveController`** timeout path, **`SolverBaselineBenchmarkIT`**, **`scripts/summarize_benchmark_csv.py`**, **`BENCHMARK_DAY2.md`**, **`conversation-record.txt`**, **`chat/conversation.txt`**; **`git commit`** with **`xuqplus@users.noreply.github.com`**.
+
+---
+
+[User] Plan A MRV as new **`CalendarJigsawMrvService`**, do not replace exhaustive.
+
+[Assistant] **`JigsawPlacementCatalog`**, **`SolverInputs`**, **`SolverInputsParser`**; refactored legacy service; **`CalendarJigsawMrvService`** + **`?solver=mrv`**; tests updated.
+
+---
+
+[User] Update rules: before commit always record **`chat/conversation.txt`** to avoid needing a second commit for logs.
+
+[Assistant] Revised **`.cursor/rules/conversation-log.mdc`** and **`git-commit-submodules.mdc`**: pre-commit append **`chat/conversation.txt`** + **`conversation-record.txt`** with substantive session work; single commit with code + logs.

@@ -4,14 +4,13 @@ import com.example.jigsawapi.dto.ResolveResponse;
 import com.example.jigsawapi.dto.SolutionDto;
 import com.example.jigsawapi.dto.SolveOutcome;
 import com.example.jigsawapi.dto.SolveStatistics;
+import com.example.jigsawapi.jigsaw.JigsawPlacementCatalog;
 import com.example.jigsawapi.jigsaw.MatrixUtil;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -37,9 +36,6 @@ public class CalendarJigsawService {
         this.resolveResponseCache = resolveResponseCache;
     }
 
-    /** Parsed query + normalized cache key ({@code d:yyyy-MM-dd|c:n} or {@code t:m:d:w|c:n}). */
-    private record SolverInputs(int month0, int day0, int weekSun0, int maxSolutions, String cacheKey) {}
-
     /** Month cells on board (0–11). Same layout as calendar-jigsaw Main. */
     private static final int[][] M = {
         {0, 0}, {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5},
@@ -60,84 +56,6 @@ public class CalendarJigsawService {
         {6, 3}, {6, 4}, {6, 5}, {6, 6}, {7, 4}, {7, 5}, {7, 6},
     };
 
-    private static final int[][] AA = {
-        {1, 1, 0, 0,},
-        {0, 1, 0, 0,},
-        {0, 1, 0, 0,},
-        {0, 1, 0, 0,},
-    };
-
-    private static final int[][] BB = {
-        {1, 0, 0,},
-        {1, 1, 0,},
-        {1, 1, 0,},
-    };
-
-    private static final int[][] CC = {
-        {1, 1, 1,},
-        {1, 0, 1,},
-        {0, 0, 0,},
-    };
-
-    private static final int[][] DD = {
-        {1, 1, 1,},
-        {1, 0, 0,},
-        {1, 0, 0,},
-    };
-
-    private static final int[][] EE = {
-        {1, 1, 0,},
-        {0, 1, 0,},
-        {0, 1, 1,},
-    };
-
-    private static final int[][] FF = {
-        {1, 1, 1,},
-        {0, 1, 0,},
-        {0, 1, 0,},
-    };
-
-    private static final int[][] GG = {
-        {1, 0, 0, 0,},
-        {1, 0, 0, 0,},
-        {1, 0, 0, 0,},
-        {1, 0, 0, 0,},
-    };
-
-    private static final int[][] HH = {
-        {1, 1, 0,},
-        {0, 1, 0,},
-        {0, 1, 0,},
-    };
-
-    private static final int[][] II = {
-        {1, 1, 0, 0,},
-        {0, 1, 1, 1,},
-        {0, 0, 0, 0,},
-        {0, 0, 0, 0,},
-    };
-
-    private static final int[][] JJ = {
-        {1, 1, 0,},
-        {0, 1, 1,},
-        {0, 0, 0,},
-    };
-
-    private static final Map<String, int[][]> ELEMENTS = new LinkedHashMap<>();
-
-    static {
-        ELEMENTS.put("AA", AA);
-        ELEMENTS.put("BB", BB);
-        ELEMENTS.put("CC", CC);
-        ELEMENTS.put("DD", DD);
-        ELEMENTS.put("EE", EE);
-        ELEMENTS.put("FF", FF);
-        ELEMENTS.put("GG", GG);
-        ELEMENTS.put("HH", HH);
-        ELEMENTS.put("II", II);
-        ELEMENTS.put("JJ", JJ);
-    }
-
     /**
      * Resolve query aligned with raas-jigsaw-web README + Play14:
      *
@@ -145,8 +63,7 @@ public class CalendarJigsawService {
      *   <li>{@code date}: preferred by Play14 ({@code MM/DD/YYYY} or {@code ISO yyyy-MM-dd})
      *   <li>else {@code month} (0–11), {@code day} (0–30), {@code week} (0–6, Sun=0)
      * </ul>
-     */
-    /**
+     *
      * Cached resolve (no deadline). Use {@link #resolve(String, Integer, Integer, Integer, Integer, Long)} with a
      * per-solution budget to cap wall time and allow partial results.
      */
@@ -160,7 +77,7 @@ public class CalendarJigsawService {
      */
     public ResolveResponse resolve(
             String date, Integer month, Integer day, Integer week, Integer count, Long timeoutMsPerSolution) {
-        SolverInputs in = buildSolverInputs(date, month, day, week, count);
+        SolverInputs in = SolverInputsParser.parse(date, month, day, week, count);
         if (timeoutMsPerSolution != null && timeoutMsPerSolution > 0) {
             long budgetMs = timeoutMsPerSolution * (long) in.maxSolutions();
             long deadlineNanos = System.nanoTime() + budgetMs * 1_000_000L;
@@ -175,41 +92,13 @@ public class CalendarJigsawService {
      */
     public SolveOutcome resolveForBenchmark(
             String date, Integer month, Integer day, Integer week, Integer count, Long timeoutMsPerSolution) {
-        SolverInputs in = buildSolverInputs(date, month, day, week, count);
+        SolverInputs in = SolverInputsParser.parse(date, month, day, week, count);
         Long deadlineNanos = null;
         if (timeoutMsPerSolution != null && timeoutMsPerSolution > 0) {
             long budgetMs = timeoutMsPerSolution * (long) in.maxSolutions();
             deadlineNanos = System.nanoTime() + budgetMs * 1_000_000L;
         }
         return computeResolve(in, deadlineNanos);
-    }
-
-    private SolverInputs buildSolverInputs(
-            String date, Integer month, Integer day, Integer week, Integer count) {
-        int max = count == null || count <= 0 ? DEFAULT_MAX : Math.min(count, HARD_CAP);
-        if (date != null && !date.isBlank()) {
-            LocalDate ld = parseDate(date.trim());
-            int m = ld.getMonthValue() - 1;
-            int d = ld.getDayOfMonth() - 1;
-            int w = weekSun0(ld);
-            String key = "d:" + ld + "|c:" + max;
-            return new SolverInputs(m, d, w, max, key);
-        }
-        if (month == null || day == null || week == null) {
-            throw new IllegalArgumentException(
-                    "Provide either `date` or all of `month`, `day`, `week` (see README).");
-        }
-        if (month < 0 || month > 11) {
-            throw new IllegalArgumentException("month must be 0–11");
-        }
-        if (day < 0 || day > 30) {
-            throw new IllegalArgumentException("day must be 0–30 (0 = 1st)");
-        }
-        if (week < 0 || week > 6) {
-            throw new IllegalArgumentException("week must be 0–6 (0 = Sunday)");
-        }
-        String key = "t:" + month + ":" + day + ":" + week + "|c:" + max;
-        return new SolverInputs(month, day, week, max, key);
     }
 
     private static boolean pastDeadline(Long deadlineNanos) {
@@ -223,7 +112,7 @@ public class CalendarJigsawService {
         int max = in.maxSolutions();
 
         int[][] target = buildTargetMatrix(m, d, w);
-        Map<String, Set<Long>> placementMap = buildPlacementMap(target);
+        Map<String, Set<Long>> placementMap = JigsawPlacementCatalog.buildPlacementMap(target);
 
         Set<Long> aa = placementMap.getOrDefault("AA", Set.of());
         Set<Long> bb = placementMap.getOrDefault("BB", Set.of());
@@ -378,21 +267,6 @@ public class CalendarJigsawService {
         a[7][2] = 1;
         a[7][3] = 1;
         return a;
-    }
-
-    private Map<String, Set<Long>> buildPlacementMap(int[][] target) {
-        Map<String, Set<Long>> placementMap = new LinkedHashMap<>();
-        for (Map.Entry<String, int[][]> entry : ELEMENTS.entrySet()) {
-            String key = entry.getKey();
-            int[][] element = entry.getValue();
-            Set<Long> set = new HashSet<>();
-            for (int[][] direction : MatrixUtil.getPossibleDirections(element)) {
-                int[][] expanded = MatrixUtil.expand(direction, target.length, target[0].length);
-                set.addAll(MatrixUtil.getPossiblePlacements(expanded, target));
-            }
-            placementMap.put(key, set);
-        }
-        return placementMap;
     }
 
     /** Sunday = 0 … Saturday = 6, aligned with {@code Date#getDay()} / Play14 {@code e.$W}. */

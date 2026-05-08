@@ -1,21 +1,23 @@
 ---
-description: Append substantive chat turns to conversation-record.txt; do this before commits when you ran the commit.
+description: Before commit, append chat/conversation.txt (and conversation-record.txt); avoid a second log-only commit.
 alwaysApply: true
 ---
 
 # Conversation log (this repo)
 
-**File:** `conversation-record.txt` at the repository root (not `chat/conversation.txt`).
+**Files**
+
+- **`chat/conversation.txt`** — human-readable session transcript (see existing style in that file).
+- **`conversation-record.txt`** — structured rolling log at repo root (`---` blocks, date markers per existing rules).
 
 **When to update**
 
 - After **substantive** back-and-forth (decisions, tasks completed, commands run, failures).
-- **Before `git commit`** when you are committing project work: append the transcript for that session first, then stage **including** `conversation-record.txt`, then commit—unless the user explicitly skips the log.
+- **Before `git commit`** when committing project work: append **both** logs for that session **first**, then **`git add`** them **together with** code/docs changes in the **same** commit—unless the user explicitly skips logging. Updating **`chat/conversation.txt`** before commit avoids forgetting it and needing a **second** commit only for the transcript.
 
 **How to write**
 
 - Prefer **append**; never overwrite unless the user asks to reset.
-- Use `---` between dated blocks. On the **first** `[User]` entry of a **new calendar day**, prefix that line with a marker: `**YYYY-MM-DD HH:mm +0800**` (date + time in **+0800**). Same day: plain `[User]` / `[Assistant]` lines in order.
-- Summarize: user intent, files touched, commands/results (e.g. install failures), and links—**no secrets, tokens, or keys**.
-
-This repo keeps a single rolling log in `conversation-record.txt`; keep entries concise.
+- **`conversation-record.txt`:** Use `---` between blocks. On the **first** `[User]` line of a **new calendar day**, prefix with `**YYYY-MM-DD HH:mm +0800**`. Same day: plain `[User]` / `[Assistant]` lines.
+- **`chat/conversation.txt`:** Follow the header comment and existing `[User]` / `[Assistant]` pattern; summarize intent, files touched, commands/results—**no secrets, tokens, or keys**.
+- Keep entries concise.

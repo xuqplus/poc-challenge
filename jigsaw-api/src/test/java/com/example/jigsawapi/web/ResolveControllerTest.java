@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.jigsawapi.service.CalendarJigsawMrvService;
 import com.example.jigsawapi.service.CalendarJigsawService;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,9 @@ class ResolveControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(
-                        new ResolveController(new CalendarJigsawService(Caffeine.newBuilder().build())))
+                        new ResolveController(
+                                new CalendarJigsawService(Caffeine.newBuilder().build()),
+                                new CalendarJigsawMrvService()))
                 .build();
     }
 
@@ -55,5 +58,16 @@ class ResolveControllerTest {
         mockMvc.perform(get("/resolve"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(1));
+    }
+
+    @Test
+    void resolve_mrvSolver_returnsOk() throws Exception {
+        mockMvc.perform(get("/resolve")
+                        .param("date", "11/11/2022")
+                        .param("count", "2")
+                        .param("solver", "mrv"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.count").value(2));
     }
 }

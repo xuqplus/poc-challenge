@@ -1,0 +1,16 @@
+---
+description: When the user asks to commit, record conversation logs first, then commit submodules, then the root repo.
+alwaysApply: true
+---
+
+# Git commit order (logs → submodules → root)
+
+When the user says **commit** (or asks to commit/save changes) **without** narrowing scope to a single repo path:
+
+0. **Conversation logs (root repo only):** If the session included substantive work you are committing, **before any `git commit`**, append **`chat/conversation.txt`** and **`conversation-record.txt`** per **`conversation-log.mdc`**, then stage them with the same changes so one commit includes code + logs—unless the user skips the log.
+
+1. **Submodules:** Read `.gitmodules` for submodule paths (this repo: `jigsaw-web`, `calendar-jigsaw`). For each submodule directory, if `git status` shows changes, `cd` there, **`git add`** the intended paths, **`git commit`** with a clear message, then return to the repository root.
+
+2. **Root:** From the repository root, **`git add`** changes. If any submodule gained a new commit, stage the submodule pointer (**`git add <submodule-path>`**). Then **`git commit`** on the root project.
+
+Skip step 0 when there is nothing substantive to log or the user opted out. Skip submodule steps when those trees are clean.
