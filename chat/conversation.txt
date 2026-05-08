@@ -56,3 +56,9 @@ Human-readable transcript for substantive agent sessions. Rules: see `.cursor/ru
 [User] Commit benchmark CSV under **`jigsaw-api`** for POC (was under **`target/`**, gitignored).
 
 [Assistant] Created **`jigsaw-api/benchmark-artifacts/`** with paired exhaustive/MRV CSV + reports + archived baseline CSV, **`README.md`**; **`BENCHMARK_DAY2.md`** points to **`benchmark-artifacts/`**.
+
+---
+
+[User] MRV LCV + benchmark paired dirs + web menu labels + fix **`menu.play.play.play15`** via route **`name`**.
+
+[Assistant] **`CalendarJigsawMrvService`** LCV / prune / **`trialOrder`**; **`benchmark-artifacts/paired/`**; **`BENCHMARK_DAY2.md`**; **`jigsaw-web`** **`routes.ts`** (`play01`–`play15`) + **`menu.play.play14`**/**`play15`**.

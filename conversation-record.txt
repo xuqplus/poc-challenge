@@ -239,4 +239,12 @@ Added **`jigsaw-api/benchmark-artifacts/`** with committed CSV + **`summarize_be
 
 ---
 
+User:
+MRV 增量域 + 数组状态（A+B）；LCV 值序与零域剪枝；配对基准与归档；Web 菜单 Play14/15 文案；修复路由 name 避免 `menu.play.play.play15`。
+
+Assistant:
+**`CalendarJigsawMrvService`**: incremental **`feasibleCount`**, array/bitmask state, LCV candidate sort, zero-domain prune, **`trialOrder`** copy to fix recursion scratch overwrite. **`benchmark-artifacts/paired/<ts>/`**: three paired runs + **`comparison.md`** / reports; **`BENCHMARK_DAY2.md`** refreshed. **`jigsaw-web`**: **`menu.play.play14` / `play15`** locale; **`routes.ts`** child names **`play01`–`play15`** so i18n resolves **`menu.play.play15`**.
+
+---
+
 [End of record]

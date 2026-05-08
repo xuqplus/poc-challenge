@@ -1,76 +1,59 @@
 # Day 2 — 求解器基准线测试结果
 
-本文件包含两层内容：**（一）与优化算法（MRV）在同一随机种子、同一批日期上的配对对比**；**（二）Day 2 文档首次记录的穷举单次运行归档**，便于对照。
+本文件包含：**（一）最新配对对比（穷举 vs MRV）**；**（二）历史上三次配对运行的归档索引**；**（三）Day 2 首次「仅穷举」单次运行归档**。
 
 **共同设定：** `random_seed = 42`，每解预算 **2000 ms**，总预算 = `2000 × requested_count` ms；场景形状：S1 = 100×1，S2 = 10×10，S3 = 1×100（共 **111** 行）。
 
 ---
 
-## （一）配对基准：穷举 vs MRV（优化算法）
+## （一）最新配对结果（推荐口径）
 
-在同一次 JVM 运行中顺序写入两份 CSV（日期与请求完全一致），便于公平对比。
+当前 MRV 实现：**增量可行域计数（A）** + **数组/位掩码回溯状态（B）** + **LCV 值排序** + **零域早剪枝**。详见 `CalendarJigsawMrvService`。
 
-### 运行元数据（配对）
+### 运行元数据（最新一次，`1778247269738`）
 
 | 字段 | 穷举 | MRV |
 |------|------|-----|
-| **run_id**（同一配对） | `daea9018-4653-4e43-84e3-e3180f3dc0d6` | 同上 |
+| **run_id** | `8803eed4-5b81-4012-912a-9e597022f262` | 同上 |
 | **random_seed** | 42 | 42 |
 | **solver** | exhaustive | mrv |
 | **数据行数** | 111 | 111 |
-| **原始 CSV**（仓库内副本） | `jigsaw-api/benchmark-artifacts/solver-exhaustive-1778245517291.csv` | `jigsaw-api/benchmark-artifacts/solver-mrv-1778245517291.csv` |
-| **脚本汇总报告**（同上目录） | `solver-exhaustive-1778245517291-report.md` | `solver-mrv-1778245517291-report.md` |
+| **仓库内目录** | `jigsaw-api/benchmark-artifacts/paired/1778247269738/` | 同上 |
+
+同目录已提交：**CSV**、穷举/MRV 各自的 **`summarize_benchmark_csv.py` 报告**，以及脚本生成的 **`comparison.md`**（完整 Markdown 对比）。
 
 ### 对比摘要（墙钟与样本）
 
-## 配对对比（同场景、同 random_seed）
-
-| 字段 | 左侧 | 右侧 |
-|------|------|------|
-| **标签** | 穷举（配对） | MRV（配对） |
-| **CSV** | `solver-exhaustive-1778245517291.csv` | `solver-mrv-1778245517291.csv` |
-| **run_id** | `daea9018-4653-4e43-84e3-e3180f3dc0d6` | `daea9018-4653-4e43-84e3-e3180f3dc0d6` |
-| **random_seed** | 42 | 42 |
-| **solver** | exhaustive | mrv |
-| **行数** | 111 | 111 |
-
-### 各场景墙钟与样本（左侧 vs 右侧）
-
-| 场景 | 说明 | 墙钟合计 (ms) 左 | 墙钟合计 (ms) 右 | 右相对左 | timed_out 次数 左/右 | 成功样本 左/右 | overlap_rejects 左/右 |
-|------|------|-------------------|------------------|---------|----------------------|----------------|-------------------------|
-| **S1** | 场景 1 — 100 日期 × 1 解 | 65832.38 | 89686.12 | **+36.23%** | 11/20 | 89/80 | 13,452,653,844/16,495,979,920 |
-| **S2** | 场景 2 — 10 日期 × 至多 10 解 | 29803.63 | 27983.53 | **-6.11%** | 0/0 | 100/100 | 6,113,966,430/5,038,262,308 |
-| **S3** | 场景 3 — 1 日期 × 至多 100 解 | 14943.45 | 23016.89 | **+54.03%** | 0/0 | 100/100 | 2,991,084,939/4,149,110,220 |
+| 场景 | 说明 | 墙钟合计 (ms) 穷举 | 墙钟合计 (ms) MRV | MRV 相对穷举 | `timed_out` 次数 穷举/MRV | 成功样本 穷举/MRV |
+|------|------|-------------------|-------------------|--------------|---------------------------|-------------------|
+| **S1** | 100 日期 × 1 解 | 66967.30 | 18457.77 | **−72.44%** | 11 / 1 | 89 / 99 |
+| **S2** | 10 日期 × 至多 10 解 | 30457.44 | 5207.91 | **−82.90%** | 0 / 0 | 100 / 100 |
+| **S3** | 1 日期 × 至多 100 解 | 15260.51 | 3578.96 | **−76.55%** | 0 / 0 | 100 / 100 |
 
 ### 全局墙钟
 
-| 指标 | 左侧 | 右侧 | 右相对左 |
-|------|------|------|----------|
-| 全部场景墙钟总和 (ms) | 110579.46 | 140686.55 | **+27.23%** |
-| 成功 / 失败样本 | 289 / 11 | 280 / 20 | — |
+| 指标 | 穷举 | MRV |
+|------|------|-----|
+| 全部场景墙钟总和 (ms) | **112 685.25** | **27 244.65**（约 **−75.82%**） |
+| 成功 / 失败样本 | 289 / 11 | **299 / 1** |
 
-**解读（本轮数据）：** 在相同日期与超时预算下，MRV 在本仓库 Java 实现中的 **总墙钟与 S1/S3 场景并未低于穷举**；S2 略快。**成功样本数**（289 vs 280）在超时边界上也可能因搜索顺序不同而不一致。后续若要优化 MRV 实施或调参，应以本配对 CSV 为回归基线。
+**解读：** 与早期初版 MRV 相比，当前实现在相同日期与超时预算下 **总墙钟显著低于穷举**，且限时场景下 **成功样本更多**。`overlap_rejects` 等指标随实现细节变化较大，跨版本对比以墙钟与成功样本为主。
 
 ### 复现命令
-
-新生成 CSV（写入 `target/benchmark-results/`，再将需要的文件拷入 `benchmark-artifacts/` 以便提交）：
 
 ```bash
 cd jigsaw-api
 ./mvnw test -Djigsaw.benchmark.compare=true -Dtest=SolverComparisonBenchmarkIT
-python3 scripts/summarize_benchmark_csv.py target/benchmark-results/solver-exhaustive-<ts>.csv
-python3 scripts/compare_benchmark_csvs.py "穷举（配对）" target/benchmark-results/solver-exhaustive-<ts>.csv "MRV（配对）" target/benchmark-results/solver-mrv-<ts>.csv
 ```
 
-仅用仓库内已提交的 CSV 重新汇总 / 对比：
+仅用仓库内已归档 CSV 重新汇总 / 对比（示例为最新目录）：
 
 ```bash
-cd jigsaw-api
-python3 scripts/summarize_benchmark_csv.py benchmark-artifacts/solver-exhaustive-1778245517291.csv
-python3 scripts/compare_benchmark_csvs.py "穷举（配对）" benchmark-artifacts/solver-exhaustive-1778245517291.csv "MRV（配对）" benchmark-artifacts/solver-mrv-1778245517291.csv
+python3 scripts/summarize_benchmark_csv.py benchmark-artifacts/paired/1778247269738/solver-exhaustive-1778247269738.csv
+python3 scripts/compare_benchmark_csvs.py "穷举" benchmark-artifacts/paired/1778247269738/solver-exhaustive-1778247269738.csv "MRV" benchmark-artifacts/paired/1778247269738/solver-mrv-1778247269738.csv
 ```
 
-仅穷举、写法与历史一致时：
+仅穷举、与历史脚本一致的单文件输出：
 
 ```bash
 ./mvnw test -Djigsaw.benchmark=true -Dtest=SolverBaselineBenchmarkIT
@@ -78,9 +61,23 @@ python3 scripts/compare_benchmark_csvs.py "穷举（配对）" benchmark-artifac
 
 ---
 
-## （二）归档：Day 2 首次穷举单次运行（历史对照）
+## （二）配对运行归档（仓库内三次对比）
 
-以下为 **首次** 基准文档记录的穷举求解器汇总（**仅穷举**，无 MRV 列；与上方配对穷举 **非同一次 JVM 计时**，数值仅供参考对照）。
+所有原始 CSV 与生成报告位于 **`jigsaw-api/benchmark-artifacts/paired/<时间戳>/`**（索引见该目录下 [`README.md`](jigsaw-api/benchmark-artifacts/paired/README.md)）。
+
+| 目录名 | run_id | MRV 阶段 | 全局墙钟 穷举 ∥ MRV (ms) | MRV 相对穷举（全局墙钟） | 成功样本 穷举 ∥ MRV |
+|--------|--------|----------|---------------------------|---------------------------|---------------------|
+| **`1778247269738`** | `8803eed4-…f262` | A+B+LCV | 112 685 ∥ **27 245** | **−75.82%** | 289 ∥ **299** |
+| **`1778246626406`** | `890d2578-…c2ad` | A+B | 112 765 ∥ 81 323 | −27.88% | 287 ∥ 293 |
+| **`1778245517291`** | `daea9018-…c0d6` | 初版 MRV | 110 579 ∥ 140 687 | **+27.23%**（慢于穷举） | 289 ∥ 280 |
+
+各目录内 **`comparison.md`** 为当时脚本输出的完整对比表；穷举侧墙钟在三次运行间有小幅波动（同 seed、同 JVM 负载差异）。
+
+---
+
+## （三）归档：Day 2 首次穷举单次运行（历史对照）
+
+以下为 **首次** 基准文档记录的穷举求解器汇总（**仅穷举**，无 MRV 列；与上文配对穷举 **非同一次 JVM 计时**）。
 
 ### 运行元数据（归档）
 
@@ -119,6 +116,6 @@ python3 scripts/compare_benchmark_csvs.py "穷举（配对）" benchmark-artifac
 ## 说明
 
 - **失败样本**：相对本次请求的解个数尚未凑满的数量（含超时前未找到任何解的情况）。
-- **归档段**中 S1 的 15 次失败对应 **`partial_timeout`**（单日期 2s 内未完成首个可行解枚举）。
-- 配对段 CSV 含 **`solver`** 列；归档 CSV 为早期格式，可无该列（脚本仍可读）。
-- 明细报告可由 `jigsaw-api/scripts/summarize_benchmark_csv.py` 从任意兼容 CSV 生成（例如 `benchmark-artifacts/*.csv`）。
+- **归档段（三）**中 S1 的 15 次失败对应 **`partial_timeout`**。
+- **配对 CSV** 含 **`solver`** 列；**归档 baseline CSV** 可为早期格式（无 `solver` 列），`summarize_benchmark_csv.py` 仍可读。
+- 明细报告：`jigsaw-api/scripts/summarize_benchmark_csv.py`；配对对比：`scripts/compare_benchmark_csvs.py`。

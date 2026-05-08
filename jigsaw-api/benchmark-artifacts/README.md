@@ -1,8 +1,10 @@
 # 基准测试导出（随仓库版本管理）
 
-本目录存放 POC 演示用的 **CSV 原始结果** 及 **`summarize_benchmark_csv.py` 生成的 Markdown 报告**。运行时 Maven 仍默认写入 `target/benchmark-results/`；复核或更新演示数据后可将新 CSV 复制到此处再提交。
+## 布局
 
-| 文件 | 说明 |
+| 路径 | 内容 |
 |------|------|
-| `solver-exhaustive-*`、`solver-mrv-*` | 同一次配对运行（同一 `run_id`，`random_seed=42`），含 `solver` 列 |
-| `solver-baseline-*` | 较早的仅穷举单次运行（CSV 无 `solver` 列，脚本仍可汇总） |
+| **`paired/<时间戳>/`** | 穷举 vs MRV **配对**运行：CSV、`comparison.md`、各 solver 的 `summarize` 报告（详见 [`paired/README.md`](paired/README.md)） |
+| **`solver-baseline-*.csv`** | Day 2 早期 **仅穷举**单次运行（无 `solver` 列），与配对穷举非同一次 JVM |
+
+新生成的文件默认在 `target/benchmark-results/`；归档时将整个 **`paired/<ts>/`** 目录或单次 CSV 拷入此处再提交。
