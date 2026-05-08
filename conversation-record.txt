@@ -255,4 +255,12 @@ Assistant:
 
 ---
 
+User:
+Play16 浏览器内 MRV；根路由 → play16；**`publicPath: './'`** 修复 GitHub Pages **`dist/`** 子路径资源 404；README 演示说明；多次 sync **`dist`**；commit、push。
+
+Assistant:
+**`jigsaw-web`**：**`src/services/jigsaw/`**（MatrixUtil / catalog / board / **`mrvSolver`**）、**`Play/Play16`**、路由与 i18n、**`config.ts`**（**`publicPath: './'`**、**`jsMinifierOptions`**）、**`/`** 重定向 **`/play/play16`**。父仓库：**`README.md`**；根 **`dist/`** 同步产物；**`conversation-record.txt`**、**`chat/conversation.txt`**。子模块先 **`git push`** **`poc-challenge`**，再父仓库 **`master`**。
+
+---
+
 [End of record]

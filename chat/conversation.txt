@@ -76,3 +76,11 @@ Human-readable transcript for substantive agent sessions. Rules: see `.cursor/ru
 [User] commit, push
 
 [Assistant] Append **`chat/conversation.txt`** / **`conversation-record.txt`**; commit **`jigsaw-web`** submodule then root (**`dist/`**, **`scripts/`**, rules, README, compose); **`git push`** submodule + parent **`master`**.
+
+---
+
+**2026-05-07**
+
+[User] Play16 本地 MRV；根路径重定向 play16；GitHub Pages **`dist/`** 静态资源 **`publicPath: './'`**；README 演示文案；sync **`dist`**；commit、push。
+
+[Assistant] **`jigsaw-web`**：客户端求解 **`services/jigsaw`**、Play16、路由/locale、**`publicPath`**；父仓库 **`README`** + **`dist/`**；会话日志；子模块与 **`master`** 推送。

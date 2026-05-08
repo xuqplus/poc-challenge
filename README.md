@@ -138,11 +138,15 @@ cd jigsaw-web && pnpm install && pnpm run dev   # 另开终端；需已初始化
 
 实现演进（归档 CSV 同路径）：初版 MRV 曾 **慢于穷举**（全局墙钟约 **+27%**）；加入增量域与数组化（A+B）后约 **−28%**；再加入 LCV 与早剪枝后达到上文 **约 −76%** 量级。
 
-### [演示前端](https://xuqplus.github.io/poc-challenge/)
+### [演示前端](https://xuqplus.github.io/poc-challenge/dist/)
 
-GitHub Pages 对应仓库根目录下的 **`dist/`**（由 `jigsaw-web` 构建后经 `./scripts/sync-web-dist-to-root.sh` 同步）。
+**Jigsaw Web** 入口（仓库根 **`dist/`** 同步产物）：<https://xuqplus.github.io/poc-challenge/dist/>（`./scripts/sync-web-dist-to-root.sh`）。
 
-- [**`/play/play14`**](https://xuqplus.github.io/poc-challenge/#/play/play14)：调用默认 **`/resolve`**（穷举求解）；[**`/play/play15`**](https://xuqplus.github.io/poc-challenge/#/play/play15)：调用 **`solver=mrv`**（优化求解）。菜单文案已区分两者（中英文）。
+前端除通过 API 演示穷举 / MRV 外，已在 **Play16** 用 TypeScript 在浏览器内实现与后端 **`CalendarJigsawMrvService`** 同结构的 **MRV + LCV** 求解（不请求 **`/resolve`**，可在无后端环境下演示）。构建产物中 **根路径 `/` 重定向至 `/play/play16`**。
+
+- [**`/play/play16`**](https://xuqplus.github.io/poc-challenge/dist/#/play/play16)：**本地前端计算**（默认落地页；哈希路由下为 `#/play/play16`）。
+- [**`/play/play14`**](https://xuqplus.github.io/poc-challenge/dist/#/play/play14)：调用默认 **`/resolve`**（穷举求解）。
+- [**`/play/play15`**](https://xuqplus.github.io/poc-challenge/dist/#/play/play15)：调用 **`solver=mrv`**（后端优化求解）。菜单文案已区分各 Play（中英文）。
 
 ---
 
